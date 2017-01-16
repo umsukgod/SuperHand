@@ -1,25 +1,31 @@
 package com.example.bcue.superhand;
 
+import android.Manifest;
 import android.content.Intent;
-import android.provider.MediaStore;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
-import static android.R.id.content;
-import static android.R.id.switch_widget;
 
 public class TitleActivity extends AppCompatActivity {
     private float mPrevX;
     private float mPrevY;
     private boolean isActivityChanged = false;
+    private static final int REQUEST_CAMERA_PERMISSION = 200;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_title);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(TitleActivity.this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
+        }
 
         View mScreen = findViewById(R.id.fullscreen_content);
         mScreen.setOnTouchListener(new View.OnTouchListener() {
@@ -48,4 +54,14 @@ public class TitleActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                // close the app
+                Toast.makeText(TitleActivity.this, "Sorry!!!, you can't use this app without granting permission", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
+    }
 }
