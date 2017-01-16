@@ -25,7 +25,6 @@ public class TitleActivity extends AppCompatActivity {
         mScreen.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.d("touched? ", "???????");
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         mPrevX = event.getX();
