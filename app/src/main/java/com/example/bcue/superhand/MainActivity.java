@@ -15,12 +15,18 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 
 public class MainActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
     private static final String TAG = "OCVSample::Activity";
     private CameraBridgeViewBase mOpenCvCameraView;
-
+    static {
+        // If you use opencv 2.4, System.loadLibrary("opencv_java")
+        System.loadLibrary("opencv_java3");
+    }
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -88,10 +94,21 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     public void onCameraViewStarted(int width, int height) {
     }
 
+
     public void onCameraViewStopped() {
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        return inputFrame.rgba();
+        Mat srcRgba , srcGray;
+        Mat dst, detected_edges;
+        srcRgba = inputFrame.rgba();
+        srcGray = inputFrame.gray();
+        dst = new Mat( srcRgba.size(), srcRgba.type());
+        detected_edges = new Mat( srcRgba.size(), srcRgba.type());
+        Imgproc.GaussianBlur(srcGray, detected_edges, new Size(3,3),2,2);
+        Imgproc.Canny(detected_edges, detected_edges, 50d, 50d*3);
+        dst.setTo(Scalar.all(0));
+        srcRgba.copyTo(dst, detected_edges);
+        return dst;
     }
 }
